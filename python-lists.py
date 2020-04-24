@@ -40,7 +40,10 @@ def registra(tipoRegistro):
 # registra(2)
 # print(listaVendedores)
 
-# - Control de inventario (alta, modificación y eliminación de productos)
+# - Control de inventario:
+#   * Alta, modificación y eliminación de productos --> OK
+#   * Agregar inventario (agregar existencias)
+#   * Ajuste de inventario (modificar existencias)
 # Información de los productos:
 # - Código de barras
 # - Descripción del producto
@@ -51,16 +54,17 @@ def registra(tipoRegistro):
 # - Ganancia --
 
 listaInventario = []
+
 def agregaProducto():
   while True:
     cb = input('Código de barras del producto: ')
     descripcion = input('Descripción del producto: ')
-    existencia = input('Cantidad a agregar: ')
+    existencia = float(input('Cantidad a agregar: '))
     pCompra = float(input('Precio de compra: '))
     pVenta = float(input('Precio de venta: '))
     proveedor = input('Proveedor: ')
-    ganancia = pVenta - pCompra
-    pctGanancia = 100/pCompra*ganancia
+    ganancia = round(pVenta - pCompra, 2)
+    pctGanancia = round(100/pCompra*ganancia, 2)
     listaInventario.append([cb, descripcion, existencia, pCompra, pVenta, proveedor, ganancia, pctGanancia])
     opc = input('Deseas agregar otro producto? (s/n): ')
     if opc == 'n' or opc == 'N':
@@ -68,12 +72,76 @@ def agregaProducto():
   return
 
 
-def modificaProducto(cb):
-  # while True:
+def buscaProducto(cb):
+  i = 0
   for lista in listaInventario:
     if cb in lista: 
-      print(lista)
+      i = listaInventario.index(lista)
+      return i
+  return -1
+
+def modificaProducto(cb):
+  i = buscaProducto(cb)
+  if(i >= 0):
+    while True:      
+      print('1. Código de barras:', listaInventario[i][0])
+      print('2. Descripción:', listaInventario[i][1])
+      print('3. Existencia:', listaInventario[i][2])
+      print('4. Precio de compra:', listaInventario[i][3])
+      print('5. Precio de venta:', listaInventario[i][4])
+      print('6. Proveedor:', listaInventario[i][5])
+      opc = int(input('Elige un número de opción a modificar: '))
+      if opc == 3 or opc == 4 or opc == 5:
+        listaInventario[i][opc-1] = float(input('Escribe el nuevo valor: '))
+        # round(numero, decimales) --> función de redondeo
+        listaInventario[i][6] = round(float(listaInventario[i][4] - listaInventario[i][3]), 2)
+        listaInventario[i][7] = round(float(100/listaInventario[i][3]*listaInventario[i][6]), 2)
+      else:
+        listaInventario[i][opc-1] = input('Escribe el nuevo valor: ')
+      opc = input('Deseas modificar otro detalle del producto? (s/n): ')
+      if opc == 'n' or opc == 'N':
+        break
+  else:
+    print('¡Error... producto NO encontrado!')
+  #print(listaInventario[i])
+  return
+
+def eliminaProducto(cb):
+  i = buscaProducto(cb)
+  if(i >= 0):
+    print('1. Código de barras:', listaInventario[i][0])
+    print('2. Descripción:', listaInventario[i][1])
+    print('3. Existencia:', listaInventario[i][2])
+    print('4. Precio de compra:', listaInventario[i][3])
+    print('5. Precio de venta:', listaInventario[i][4])
+    print('6. Proveedor:', listaInventario[i][5])
+    opc = input('Estás seguro de que deseas eliminar este producto? (s/n): ')
+    if opc == 'n' or opc == 'N':
+      return
+    else:
+      del listaInventario[i]
+  else:
+    print('¡Error... producto NO encontrado!')
+  
+  #print(listaInventario)
+  return
+
+def agregaInventario(cb):
+  i = buscaProducto(cb)
+  if(i >= 0):
+    print('Código de barras:', listaInventario[i][0])
+    print('Descripción:', listaInventario[i][1])
+    print('Existencia:', listaInventario[i][2])
+    existencia = float(input('Escribe la cantidad a agregar: '))
+    #listaInventario[i][2] = float(existencia + listaInventario[i][2])
+    listaInventario[i][2] += existencia
+  else:
+    print('¡Error... producto NO encontrado!')
+
+  #print(listaInventario[i])
   return
 
 agregaProducto()
 modificaProducto('123')
+# eliminaProducto('123')
+agregaInventario('123')
