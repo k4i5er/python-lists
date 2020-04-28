@@ -1,7 +1,8 @@
+
 # La cadena comercial Oxxito necesita una aplicación que le permita manejar
 # sus procesos de inventarios, proveedores y venta a público en general.
 # Sus necesidades son las siguientes:
-# - Registro de ventas
+# - Registro de ventas --> TAREA
 # - Reportes (ventas por día, inventario, proveedores)
 
 # - Llevar un registro de sus proveedores (nombre, número de contacto, empresa)
@@ -42,8 +43,8 @@ def registra(tipoRegistro):
 
 # - Control de inventario:
 #   * Alta, modificación y eliminación de productos --> OK
-#   * Agregar inventario (agregar existencias)
-#   * Ajuste de inventario (modificar existencias)
+#   * Agregar inventario (agregar existencias) --> OK
+#   * Ajuste de inventario (modificar existencias) -> TAREA
 # Información de los productos:
 # - Código de barras
 # - Descripción del producto
@@ -57,7 +58,7 @@ listaInventario = []
 
 def agregaProducto():
   while True:
-    cb = input('Código de barras del producto: ')
+    cb = int(input('Código de barras del producto: '))
     descripcion = input('Descripción del producto: ')
     existencia = float(input('Cantidad a agregar: '))
     pCompra = float(input('Precio de compra: '))
@@ -141,7 +142,60 @@ def agregaInventario(cb):
   #print(listaInventario[i])
   return
 
-agregaProducto()
-modificaProducto('123')
+def ajustaInventario(cb):
+  i = buscaProducto(cb)
+  if i>= 0:
+    print('Código de barras:', listaInventario[i][0])
+    print('Descripción:', listaInventario[i][1])
+    print('Existencia:', listaInventario[i][2])
+    cantidad = int(input('Cantidad a ajustar (la cantidad puede ser positiva o negativa): '))
+    listaInventario[i][2] += cantidad
+    print(listaInventario[i])
+  else:
+    print('¡Error... producto NO encontrado!')
+
+# Reporte de inventario --> OK
+# Código de barras  Descripción       Existencias   P.Compra  P.Venta   PCT. Ganancia   Ganancia
+# 123               Gansito Marinela  5             $7.5      $12.00    60%             $4.5
+
+def reporteInventario():
+  print('C. de barras\tDescripción\t\tExist.\tP.Compra\tP.Vta\tProveedor\t%Ganancia')
+  for producto in listaInventario:
+    # print(str(producto[0])+'\t'+producto[1]+'\t'+str(producto[2])+'\t$'+str(producto[3])+'\t\t$'+str(producto[4])+'\t'+producto[5]+'\t'+str(producto[7])+'%')
+    pv = producto[4]
+    cb = producto[0]
+    prov = producto[5]
+    exist = producto[2]
+    pct = producto[7]
+    pc = producto[3]
+    desc = producto[1]
+    detalleProd = '{}\t{}\t{}\t${}\t\t${}\t{}\t{}%'
+    print(detalleProd.format(cb, desc, exist, pc, pv, prov, pct))
+
+# Reporte de proveedores --> OK
+# Nombre del proveedor    Empresa               Número de contacto
+# Juan Pérez              Bimbo                 7444444444
+def reporteProveedores():
+  print('Nombre del proveedor\t\tNúmero de contacto\tEmpresa')
+  for proveedor in listaProveedores:
+    detalleProv = '{}\t\t\t{}\t\t{}'
+    print(detalleProv.format(proveedor[0], proveedor[1], proveedor[2]))
+
+
+# agregaProducto()
+# modificaProducto('123')
 # eliminaProducto('123')
-agregaInventario('123')
+# ajustaInventario(123)
+# reporteInventario()
+registra(1)
+reporteProveedores()
+
+# Registro de ventas
+# Buscar producto
+# Mostrar detalle del producto (cb, descripción, precio vta)
+# Pedir cantidad de producto a vender (IMPORTANTE!!! NO podemos vender más productos de los que hay en inventario)
+# Mostrar el total de la venta y preguntar si desea comprar otro producto
+# Una vez que ya no quiero comprar más productos, mostrar el total de la venta
+# Mostrar una opción para pagar o para vender otro producto
+# Al momento de pagar, preguntar con cuánto paga
+# Si el pago no es exacto, entonces calcular el cambio y mostrarlo
