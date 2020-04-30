@@ -1,4 +1,8 @@
-
+import datetime
+date = datetime.datetime.now()
+print("Fecha actual: "+str(date.day)+"/"+str(date.month)+"/"+str(date.year))
+print("Fecha actual: "+str(date.day)+"/"+date.strftime("%B")+"/"+str(date.year))
+print("Hora actual: "+str(date.hour)+":"+str(date.minute))
 # La cadena comercial Oxxito necesita una aplicación que le permita manejar
 # sus procesos de inventarios, proveedores y venta a público en general.
 # Sus necesidades son las siguientes:
@@ -55,6 +59,11 @@ def registra(tipoRegistro):
 # - Ganancia --
 
 listaInventario = []
+
+listaInventario =[ 
+  [123, 'Gansito Marinela', 4, 7.50, 12.00, 'Marinela', 4.50, 60.0],
+  [321, 'Chips Jalapeño', 7, 10.9, 15.00, 'Barcel', 5.10, 46.79]
+]
 
 def agregaProducto():
   while True:
@@ -187,8 +196,8 @@ def reporteProveedores():
 # eliminaProducto('123')
 # ajustaInventario(123)
 # reporteInventario()
-registra(1)
-reporteProveedores()
+# registra(1)
+# reporteProveedores()
 
 # Registro de ventas
 # Buscar producto
@@ -199,3 +208,58 @@ reporteProveedores()
 # Mostrar una opción para pagar o para vender otro producto
 # Al momento de pagar, preguntar con cuánto paga
 # Si el pago no es exacto, entonces calcular el cambio y mostrarlo
+# ::: NUEVA TAREA :::
+# Incluir en el registro de ventas, la fecha y la hora en que se realizó la venta
+# Llevar un registro de ventas en una lista paralela a la del inventario
+
+
+
+def registraVentas():
+  importe = 0
+  while True:
+    while True:
+      cb = int(input('Código de barras del producto: '))
+      producto = buscaProducto(cb)
+      print('Código de barras:',str(listaInventario[producto][0]))
+      print("Descripción:",str(listaInventario[producto][1]))
+      print('Precio: $',str(listaInventario[producto][4]))
+      while True:
+        cantidad = float(input('Cantidad a vender:'))
+        if(listaInventario[producto][2] < cantidad and cantidad >0):
+          print('No hay existencia suficiente, intenta con otra cantidad, o escribe -1 para continuar....')
+        elif cantidad == -1:
+          break
+        else:
+          listaInventario[producto][2] -= cantidad
+          break
+      if cantidad !=  -1:
+        importe += cantidad * listaInventario[producto][4]
+      print('El importe es $'+str(importe))
+      opc = input('Deseas seguir vendiendo? (s/n):')
+      if opc == 'n' or opc == 'N':
+        break
+    opc = int(input('1--> Finalizar compra, 2-->Vender otro producto: '))
+    if opc == 1:
+      break
+  while True:
+    print('El total es $'+str(importe))
+    pagar = float(input('Con cuánto paga?'))
+    if pagar < importe:
+      print('Te falta dinero para completar el importe, no te hagas wey!')
+    else:
+      print('Tu cambio es $'+str(pagar - importe))
+      print('Gracias por su compra, vuelva pronto (=')
+
+      break
+
+registraVentas()
+
+# Módulo de reporte de ventas ::: TAREA :::
+# Se necesita:
+# - Registro de ventas con la siguiente información
+#   * Número de venta
+#   * cb del/los producto(s)
+#   * descripción del producto
+#   * precio de venta
+#   * fecha/hora de venta
+# def reporteVentas():
