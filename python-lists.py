@@ -213,11 +213,14 @@ def reporteProveedores():
 # Llevar un registro de ventas en una lista paralela a la del inventario
 
 
-
+listaRegistroVenta = []
+numVenta = 0
 def registraVentas():
+  listaProductosxVender = []
   importe = 0
   while True:
     while True:
+      update = False
       cb = int(input('Código de barras del producto: '))
       producto = buscaProducto(cb)
       print('Código de barras:',str(listaInventario[producto][0]))
@@ -235,6 +238,15 @@ def registraVentas():
       if cantidad !=  -1:
         importe += cantidad * listaInventario[producto][4]
       print('El importe es $'+str(importe))
+      for elementos in listaProductosxVender:
+        indice = listaProductosxVender.index(elementos)
+        if cb in elementos:
+          listaProductosxVender[indice][3] += cantidad
+          listaProductosxVender[indice][4] = listaProductosxVender[indice][3] * listaProductosxVender[indice][2]
+          update = True
+          break
+      if not update:
+        listaProductosxVender.append([cb, listaInventario[producto][1], listaInventario[producto][4], cantidad, cantidad*listaInventario[producto][4]])
       opc = input('Deseas seguir vendiendo? (s/n):')
       if opc == 'n' or opc == 'N':
         break
@@ -249,7 +261,8 @@ def registraVentas():
     else:
       print('Tu cambio es $'+str(pagar - importe))
       print('Gracias por su compra, vuelva pronto (=')
-
+      listaRegistroVenta.append([str(date.day)+"/"+str(date.month)+"/"+str(date.year), str(date.hour)+':'+str(date.minute),(numVenta+1),listaProductosxVender])
+      print(listaRegistroVenta)
       break
 
 registraVentas()
