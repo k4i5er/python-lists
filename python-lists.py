@@ -59,6 +59,7 @@ def registra(tipoRegistro):
 # - Ganancia --
 
 listaInventario = []
+listaMovimientos = []
 
 listaInventario =[ 
   [123, 'Gansito Marinela', 4, 7.50, 12.00, 'Marinela', 4.50, 60.0],
@@ -158,7 +159,9 @@ def ajustaInventario(cb):
     print('Descripción:', listaInventario[i][1])
     print('Existencia:', listaInventario[i][2])
     cantidad = int(input('Cantidad a ajustar (la cantidad puede ser positiva o negativa): '))
+    razon = input('Motivo del ajuste: ')
     listaInventario[i][2] += cantidad
+
     print(listaInventario[i])
   else:
     print('¡Error... producto NO encontrado!')
@@ -214,8 +217,8 @@ def reporteProveedores():
 
 
 listaRegistroVenta = []
-numVenta = 0
 def registraVentas():
+  numVenta = len(listaRegistroVenta)
   listaProductosxVender = []
   importe = 0
   while True:
@@ -261,10 +264,12 @@ def registraVentas():
     else:
       print('Tu cambio es $'+str(pagar - importe))
       print('Gracias por su compra, vuelva pronto (=')
-      listaRegistroVenta.append([str(date.day)+"/"+str(date.month)+"/"+str(date.year), str(date.hour)+':'+str(date.minute),(numVenta+1),listaProductosxVender])
+      numVenta += 1
+      listaRegistroVenta.append([str(date.day)+"/"+str(date.month)+"/"+str(date.year), str(date.hour)+':'+str(date.minute),numVenta,listaProductosxVender])
       print(listaRegistroVenta)
       break
 
+registraVentas()
 registraVentas()
 
 # Módulo de reporte de ventas ::: TAREA :::
@@ -275,4 +280,21 @@ registraVentas()
 #   * descripción del producto
 #   * precio de venta
 #   * fecha/hora de venta
-# def reporteVentas():
+def reporteVentas(dia, mes, anio):
+  print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
+  for venta in listaRegistroVenta:
+    fecha = venta[0].split('/')
+    if dia in fecha and mes in fecha and anio in fecha:
+      fecha = venta[0]
+      hora = venta[1]
+      nVenta = venta[2]
+      for producto in venta[3]:
+        descripcion = producto[1]
+        cantidad = producto[3]
+        precio = producto[2]
+        importe = producto[4]
+        detalleVenta = '{}\t{}\t{}\t{}\t{}\t{}\t{}' 
+        print(detalleVenta.format(nVenta, fecha, hora, descripcion, cantidad, precio, importe))
+
+reporteVentas('5','5','2020')
+
