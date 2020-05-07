@@ -1,8 +1,7 @@
 import datetime
-date = datetime.datetime.now()
-print("Fecha actual: "+str(date.day)+"/"+str(date.month)+"/"+str(date.year))
-print("Fecha actual: "+str(date.day)+"/"+date.strftime("%B")+"/"+str(date.year))
-print("Hora actual: "+str(date.hour)+":"+str(date.minute))
+# print("Fecha actual: "+str(date.day)+"/"+str(date.month)+"/"+str(date.year))
+# print("Fecha actual: "+str(date.day)+"/"+date.strftime("%B")+"/"+str(date.year))
+# print("Hora actual: "+str(date.hour)+":"+str(date.minute))
 # La cadena comercial Oxxito necesita una aplicación que le permita manejar
 # sus procesos de inventarios, proveedores y venta a público en general.
 # Sus necesidades son las siguientes:
@@ -57,6 +56,29 @@ def registra(tipoRegistro):
 # - Precio de venta*
 # - Proveedor
 # - Ganancia --
+
+# listaMovimientos = [
+#  [
+#    fecha,
+#    hora,
+#    descripciónProducto,
+#    movimiento,
+#    cantAnterior,
+#    tipoMovimiento,
+#    cantidadMovimiento,
+#    cantidadActual
+#   ],
+#   [
+#    fecha,
+#    hora,
+#    descripciónProducto,
+#    movimiento,
+#    cantAnterior,
+#    tipoMovimiento,
+#    cantidadMovimiento,
+#    cantidadActual
+#   ],
+# ]
 
 listaInventario = []
 listaMovimientos = []
@@ -137,20 +159,99 @@ def eliminaProducto(cb):
   #print(listaInventario)
   return
 
+def getDate():
+  date = datetime.datetime.now()
+  month = ''
+  day = ''
+  year = ''
+  date = datetime.datetime.now()
+  if date.day < 10:
+    day = '0'+str(date.day)
+  else:
+    day = str(date.day)
+  if date.month < 10:
+    month = '0'+str(date.month)
+  else:
+    month = str(date.month)
+  if date.year < 10:
+    year = '0'+str(date.year)
+  else:
+    year = str(date.year)
+
+  return day+'/'+month+'/'+year
+
+numInventario = 0
+
+def getHour():
+  hour = ''
+  minute = ''
+  second = ''
+  date = datetime.datetime.now()
+  if date.hour < 10:
+    hour = '0'+str(date.hour)
+  else:
+    hour = str(date.hour)
+  if date.minute < 10:
+    minute = '0'+str(date.minute)
+  else:
+    minute = str(date.minute)
+  if date.second < 10:
+    second = '0'+str(date.second)
+  else:
+    second = str(date.second)
+  return hour+':'+minute+':'+second
+
+def registraMovimiento(tipoMovimiento, i, cantidad, nM, razon=False):
+  # Función registroMovimiento(tipoMovimiento)
+    # - Parámetro para tipo de movimiento
+    # - Parámetro para cantidadMovimiento
+    # - Parámetro para descripcion del producto
+    # - Parámetro para la cantidad a agregar/quitar
+    # tipoMovimiento = 'Entrada'/'Salida'/'Devolución'/'Ajuste'
+    nM += 1
+    if tipoMovimiento == 'Entrada':
+      movimiento = 'Recepción de inventario #'+str(nM)
+    elif tipoMovimiento == 'Salida':
+      movimiento = 'Venta #'
+    elif tipoMovimiento == 'Devolución':
+      movimiento = 'Devolución de venta #'
+    elif tipoMovimiento == 'Ajuste':
+      movimiento = 'Ajuste:',razon
+    listaMovimientos.append([
+      getDate(),
+      getHour(),
+      listaInventario[i][1],
+      movimiento,
+      listaInventario[i][2],
+      tipoMovimiento,
+      cantidad,
+      listaInventario[i][2] + cantidad
+    ])
+    return
+
 def agregaInventario(cb):
   i = buscaProducto(cb)
+  # numInventario = numInventario + 1
   if(i >= 0):
+    print('numInventario',numInventario)
     print('Código de barras:', listaInventario[i][0])
     print('Descripción:', listaInventario[i][1])
-    print('Existencia:', listaInventario[i][2])
-    existencia = float(input('Escribe la cantidad a agregar: '))
-    #listaInventario[i][2] = float(existencia + listaInventario[i][2])
-    listaInventario[i][2] += existencia
+    print('Existencia:', str(listaInventario[i][2]))
+    cantidad = float(input('Escribe la cantidad a agregar: '))
+    # Inicia registro del movimiento...
+    registraMovimiento('Entrada', i, cantidad, numInventario)
+    # Fin de registro de movimientos
+    listaInventario[i][2] += cantidad
   else:
     print('¡Error... producto NO encontrado!')
 
   #print(listaInventario[i])
   return
+
+agregaInventario(123)
+numInventario+=1
+agregaInventario(321)
+print(listaMovimientos)
 
 def ajustaInventario(cb):
   i = buscaProducto(cb)
@@ -269,8 +370,8 @@ def registraVentas():
       print(listaRegistroVenta)
       break
 
-registraVentas()
-registraVentas()
+# registraVentas()
+# registraVentas()
 
 # Módulo de reporte de ventas ::: TAREA :::
 # Se necesita:
@@ -296,5 +397,5 @@ def reporteVentas(dia, mes, anio):
         detalleVenta = '{}\t{}\t{}\t{}\t{}\t{}\t{}' 
         print(detalleVenta.format(nVenta, fecha, hora, descripcion, cantidad, precio, importe))
 
-reporteVentas('5','5','2020')
+# reporteVentas('5','5','2020')
 
