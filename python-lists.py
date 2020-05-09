@@ -201,31 +201,43 @@ def getHour():
     second = str(date.second)
   return hour+':'+minute+':'+second
 
-def registraMovimiento(tipoMovimiento, i, cantidad, nM, razon=False):
+def registraMovimiento(fecha, hora, tipoMovimiento, i, cantidad, razon=False, numV=0):
   # Función registroMovimiento(tipoMovimiento)
     # - Parámetro para tipo de movimiento
     # - Parámetro para cantidadMovimiento
     # - Parámetro para descripcion del producto
     # - Parámetro para la cantidad a agregar/quitar
     # tipoMovimiento = 'Entrada'/'Salida'/'Devolución'/'Ajuste'
-    nM += 1
+    habia = 0
+    hay = 0
     if tipoMovimiento == 'Entrada':
-      movimiento = 'Recepción de inventario #'+str(nM)
+      global numInventario
+      numInventario +=1
+      hay = listaInventario[i][2] + cantidad
+      habia = listaInventario[i][2]
+      movimiento = f'Recepción de inventario #{numInventario}'
     elif tipoMovimiento == 'Salida':
-      movimiento = 'Venta #'
+      habia = listaInventario[i][2] + cantidad
+      hay = listaInventario[i][2]
+      movimiento = f'Venta #{numV}'
     elif tipoMovimiento == 'Devolución':
+      
       movimiento = 'Devolución de venta #'
     elif tipoMovimiento == 'Ajuste':
-      movimiento = 'Ajuste:',razon
+      global numAjuste
+      numAjuste += 1
+      habia = listaInventario[i][2]
+      hay = listaInventario[i][2] + cantidad
+      movimiento = f'Ajuste #{numAjuste}: {razon}'
     listaMovimientos.append([
-      getDate(),
-      getHour(),
+      fecha,
+      hora,
       listaInventario[i][1],
       movimiento,
-      listaInventario[i][2],
+      habia,
       tipoMovimiento,
       cantidad,
-      listaInventario[i][2] + cantidad
+      hay
     ])
     return
 
@@ -239,7 +251,7 @@ def agregaInventario(cb):
     print('Existencia:', str(listaInventario[i][2]))
     cantidad = float(input('Escribe la cantidad a agregar: '))
     # Inicia registro del movimiento...
-    registraMovimiento('Entrada', i, cantidad, numInventario)
+    registraMovimiento(getDate(), getHour(), 'Entrada', i, cantidad)
     # Fin de registro de movimientos
     listaInventario[i][2] += cantidad
   else:
@@ -248,10 +260,10 @@ def agregaInventario(cb):
   #print(listaInventario[i])
   return
 
-agregaInventario(123)
-numInventario+=1
-agregaInventario(321)
-print(listaMovimientos)
+# agregaInventario(123)
+# agregaInventario(321)
+
+numAjuste = 0
 
 def ajustaInventario(cb):
   i = buscaProducto(cb)
@@ -261,11 +273,15 @@ def ajustaInventario(cb):
     print('Existencia:', listaInventario[i][2])
     cantidad = int(input('Cantidad a ajustar (la cantidad puede ser positiva o negativa): '))
     razon = input('Motivo del ajuste: ')
+    registraMovimiento(getDate(), getHour(), 'Ajuste', i, cantidad, razon)
     listaInventario[i][2] += cantidad
 
     print(listaInventario[i])
   else:
     print('¡Error... producto NO encontrado!')
+
+ajustaInventario(123)
+print(listaMovimientos)
 
 # Reporte de inventario --> OK
 # Código de barras  Descripción       Existencias   P.Compra  P.Venta   PCT. Ganancia   Ganancia
@@ -282,8 +298,7 @@ def reporteInventario():
     pct = producto[7]
     pc = producto[3]
     desc = producto[1]
-    detalleProd = '{}\t{}\t{}\t${}\t\t${}\t{}\t{}%'
-    print(detalleProd.format(cb, desc, exist, pc, pv, prov, pct))
+    print(f'{cb}\t{desc}\t{exist}\t${pc}\t\t${pv}\t{prov}\t{pct}%')
 
 # Reporte de proveedores --> OK
 # Nombre del proveedor    Empresa               Número de contacto
@@ -318,8 +333,10 @@ def reporteProveedores():
 
 
 listaRegistroVenta = []
+numVenta = len(listaRegistroVenta)
+
 def registraVentas():
-  numVenta = len(listaRegistroVenta)
+  global numVenta
   listaProductosxVender = []
   importe = 0
   while True:
@@ -366,11 +383,16 @@ def registraVentas():
       print('Tu cambio es $'+str(pagar - importe))
       print('Gracias por su compra, vuelva pronto (=')
       numVenta += 1
-      listaRegistroVenta.append([str(date.day)+"/"+str(date.month)+"/"+str(date.year), str(date.hour)+':'+str(date.minute),numVenta,listaProductosxVender])
-      print(listaRegistroVenta)
+      registro = [getDate(), getHour(), numVenta, listaProductosxVender]
+      listaRegistroVenta.append(registro)
+      for producto in listaProductosxVender:
+        i = buscaProducto(producto[0])
+        registraMovimiento(registro[0], registro[1], 'Salida', i, producto[3], False, registro[2])
+      # print(listaRegistroVenta)
       break
 
-# registraVentas()
+registraVentas()
+print(listaMovimientos)
 # registraVentas()
 
 # Módulo de reporte de ventas ::: TAREA :::
