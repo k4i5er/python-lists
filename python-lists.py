@@ -221,8 +221,9 @@ def registraMovimiento(fecha, hora, tipoMovimiento, i, cantidad, razon=False, nu
       hay = listaInventario[i][2]
       movimiento = f'Venta #{numV}'
     elif tipoMovimiento == 'Devolución':
-      
-      movimiento = 'Devolución de venta #'
+      hay = listaInventario[i][2] + cantidad
+      habia = listaInventario[i][2]      
+      movimiento = f'Devolución de venta #{numV}'
     elif tipoMovimiento == 'Ajuste':
       global numAjuste
       numAjuste += 1
@@ -279,9 +280,6 @@ def ajustaInventario(cb):
     print(listaInventario[i])
   else:
     print('¡Error... producto NO encontrado!')
-
-ajustaInventario(123)
-print(listaMovimientos)
 
 # Reporte de inventario --> OK
 # Código de barras  Descripción       Existencias   P.Compra  P.Venta   PCT. Ganancia   Ganancia
@@ -391,8 +389,7 @@ def registraVentas():
       # print(listaRegistroVenta)
       break
 
-registraVentas()
-print(listaMovimientos)
+
 # registraVentas()
 
 # Módulo de reporte de ventas ::: TAREA :::
@@ -418,6 +415,45 @@ def reporteVentas(dia, mes, anio):
         importe = producto[4]
         detalleVenta = '{}\t{}\t{}\t{}\t{}\t{}\t{}' 
         print(detalleVenta.format(nVenta, fecha, hora, descripcion, cantidad, precio, importe))
+
+def cancelaVenta(numVenta):
+  cantidad = 0
+  for venta in listaRegistroVenta:
+    if numVenta in venta:
+      venta.append('CANCELADA')
+      for productos in venta[3:-1]:
+        for producto in productos:
+          cantidad = producto[3]
+          registraMovimiento(getDate(), getHour(), 'Devolución', buscaProducto(producto[0]), cantidad, False, numVenta)
+          listaInventario[buscaProducto(producto[0])][2] += cantidad
+      break
+
+def cancelaProducto(numVenta, cb):
+  found = False
+  for venta in listaRegistroVenta:
+    if numVenta in venta:
+      for productos in venta[3:]:
+        for producto in productos:
+          if cb in producto:
+            registraMovimiento(getDate(), getHour(), 'Devolución', buscaProducto(producto[0]), producto[3], False, numVenta)
+            listaInventario[buscaProducto(producto[0])][2] += producto[3]
+            del venta[venta.index(productos)][productos.index(producto)]
+            found = True
+            break
+        if found == True: break
+      if found == True: break
+  
+  
+registraVentas()
+# print(listaMovimientos)
+# cancelaVenta(1)
+cancelaProducto(1, 123)
+print('lista de movimientos: ',listaMovimientos)
+print('reg. Venta: ',listaRegistroVenta)
+print('reg. inventario: ',listaInventario)
+
+# ajustaInventario(123)
+# print(listaMovimientos)
 
 # reporteVentas('5','5','2020')
 
