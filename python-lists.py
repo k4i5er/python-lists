@@ -82,6 +82,10 @@ def registra(tipoRegistro):
 
 listaInventario = []
 listaMovimientos = []
+numInventario = 0
+numAjuste = 0
+listaRegistroVenta = []
+numVenta = len(listaRegistroVenta)
 
 listaInventario =[ 
   [123, 'Gansito Marinela', 4, 7.50, 12.00, 'Marinela', 4.50, 60.0],
@@ -136,7 +140,6 @@ def modificaProducto(cb):
         break
   else:
     print('¡Error... producto NO encontrado!')
-  #print(listaInventario[i])
   return
 
 def eliminaProducto(cb):
@@ -155,8 +158,6 @@ def eliminaProducto(cb):
       del listaInventario[i]
   else:
     print('¡Error... producto NO encontrado!')
-  
-  #print(listaInventario)
   return
 
 def getDate():
@@ -177,10 +178,8 @@ def getDate():
     year = '0'+str(date.year)
   else:
     year = str(date.year)
-
   return day+'/'+month+'/'+year
 
-numInventario = 0
 
 def getHour():
   hour = ''
@@ -244,7 +243,6 @@ def registraMovimiento(fecha, hora, tipoMovimiento, i, cantidad, razon=False, nu
 
 def agregaInventario(cb):
   i = buscaProducto(cb)
-  # numInventario = numInventario + 1
   if(i >= 0):
     print('numInventario',numInventario)
     print('Código de barras:', listaInventario[i][0])
@@ -257,14 +255,7 @@ def agregaInventario(cb):
     listaInventario[i][2] += cantidad
   else:
     print('¡Error... producto NO encontrado!')
-
-  #print(listaInventario[i])
   return
-
-# agregaInventario(123)
-# agregaInventario(321)
-
-numAjuste = 0
 
 def ajustaInventario(cb):
   i = buscaProducto(cb)
@@ -276,19 +267,12 @@ def ajustaInventario(cb):
     razon = input('Motivo del ajuste: ')
     registraMovimiento(getDate(), getHour(), 'Ajuste', i, cantidad, razon)
     listaInventario[i][2] += cantidad
-
-    print(listaInventario[i])
   else:
     print('¡Error... producto NO encontrado!')
-
-# Reporte de inventario --> OK
-# Código de barras  Descripción       Existencias   P.Compra  P.Venta   PCT. Ganancia   Ganancia
-# 123               Gansito Marinela  5             $7.5      $12.00    60%             $4.5
 
 def reporteInventario():
   print('C. de barras\tDescripción\t\tExist.\tP.Compra\tP.Vta\tProveedor\t%Ganancia')
   for producto in listaInventario:
-    # print(str(producto[0])+'\t'+producto[1]+'\t'+str(producto[2])+'\t$'+str(producto[3])+'\t\t$'+str(producto[4])+'\t'+producto[5]+'\t'+str(producto[7])+'%')
     pv = producto[4]
     cb = producto[0]
     prov = producto[5]
@@ -298,40 +282,11 @@ def reporteInventario():
     desc = producto[1]
     print(f'{cb}\t{desc}\t{exist}\t${pc}\t\t${pv}\t{prov}\t{pct}%')
 
-# Reporte de proveedores --> OK
-# Nombre del proveedor    Empresa               Número de contacto
-# Juan Pérez              Bimbo                 7444444444
 def reporteProveedores():
   print('Nombre del proveedor\t\tNúmero de contacto\tEmpresa')
   for proveedor in listaProveedores:
     detalleProv = '{}\t\t\t{}\t\t{}'
     print(detalleProv.format(proveedor[0], proveedor[1], proveedor[2]))
-
-
-# agregaProducto()
-# modificaProducto('123')
-# eliminaProducto('123')
-# ajustaInventario(123)
-# reporteInventario()
-# registra(1)
-# reporteProveedores()
-
-# Registro de ventas
-# Buscar producto
-# Mostrar detalle del producto (cb, descripción, precio vta)
-# Pedir cantidad de producto a vender (IMPORTANTE!!! NO podemos vender más productos de los que hay en inventario)
-# Mostrar el total de la venta y preguntar si desea comprar otro producto
-# Una vez que ya no quiero comprar más productos, mostrar el total de la venta
-# Mostrar una opción para pagar o para vender otro producto
-# Al momento de pagar, preguntar con cuánto paga
-# Si el pago no es exacto, entonces calcular el cambio y mostrarlo
-# ::: NUEVA TAREA :::
-# Incluir en el registro de ventas, la fecha y la hora en que se realizó la venta
-# Llevar un registro de ventas en una lista paralela a la del inventario
-
-
-listaRegistroVenta = []
-numVenta = len(listaRegistroVenta)
 
 def registraVentas():
   global numVenta
@@ -386,21 +341,58 @@ def registraVentas():
       for producto in listaProductosxVender:
         i = buscaProducto(producto[0])
         registraMovimiento(registro[0], registro[1], 'Salida', i, producto[3], False, registro[2])
-      # print(listaRegistroVenta)
       break
 
+# Reportes de ventas:
+# - Por día --> fecha(día/mes/año)
+# - Por mes
+#   * Mes natural --> desde fecha inicial (día actual/mes anterior/año) hasta fecha final (actual) 
+#   * Mes calendario --> desde 1er día del mes actual hasta último día del mes actual
+# - Por año
+#   * Año natural --> desde día/mes/año anterior hasta día/mes/año actual
+#   * Año calendario --> desde el primer día del año hasta la fecha actual
+# - Por periodo personalizado (fechas)
+#   * Desde una fecha inicial hasta una fecha final elegida por el usuario
+def menu():
+  print('''
+  --- Reporte de ventas ---
+  1. Ventas por día
+  2. Ventas por mes
+  3. Ventas por año
+  4. Ventas por periodo
+  ''')
+  opc = input('Elige un tipo de reporte: ')
+  if opc == '1': 
+    dia = input('Escribe el día: ')
+    mes = input('Escribe el mes: ')
+    anio = input('Escribe el año: ')
+    ventasDia(dia, mes, anio)
+  elif opc == '2':
+    print('''
+      1. Mes natural
+      2. Mes calendario
+      ''')
+    opc = input('Elige el tipo de mes: ')    
+    ventaMes(opc)
+   
+def ventaMes(opc):
+  if opc == '1':
+    print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
+    fechaActual = getDate().split('/')
+    fechaMesAnterior = [fechaActual[0], str(f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 else int(fechaActual[1])-1), fechaActual[2]]
+    if fechaMesAnterior[1] == '00':
+      fechaMesAnterior[1] = '12'
+      fechaMesAnterior[2] = str(int(fechaActual[2])-1)
+    print('fechaActual -->',fechaActual)
+    print('fechaAnterior -->',fechaMesAnterior)
 
+    # for venta in listaRegistroVenta:
+    #   print(venta[0])
+   
 # registraVentas()
+ventaMes('1')
 
-# Módulo de reporte de ventas ::: TAREA :::
-# Se necesita:
-# - Registro de ventas con la siguiente información
-#   * Número de venta
-#   * cb del/los producto(s)
-#   * descripción del producto
-#   * precio de venta
-#   * fecha/hora de venta
-def reporteVentas(dia, mes, anio):
+def ventasDia(dia, mes, anio):
   print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
   for venta in listaRegistroVenta:
     fecha = venta[0].split('/')
@@ -442,15 +434,16 @@ def cancelaProducto(numVenta, cb):
             break
         if found == True: break
       if found == True: break
-  
-  
-registraVentas()
+
+
+
+# registraVentas()
 # print(listaMovimientos)
 # cancelaVenta(1)
-cancelaProducto(1, 123)
-print('lista de movimientos: ',listaMovimientos)
-print('reg. Venta: ',listaRegistroVenta)
-print('reg. inventario: ',listaInventario)
+# cancelaProducto(1, 123)
+# print('lista de movimientos: ',listaMovimientos)
+# print('reg. Venta: ',listaRegistroVenta)
+# print('reg. inventario: ',listaInventario)
 
 # ajustaInventario(123)
 # print(listaMovimientos)
