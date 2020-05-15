@@ -1,7 +1,4 @@
 import datetime
-# print("Fecha actual: "+str(date.day)+"/"+str(date.month)+"/"+str(date.year))
-# print("Fecha actual: "+str(date.day)+"/"+date.strftime("%B")+"/"+str(date.year))
-# print("Hora actual: "+str(date.hour)+":"+str(date.minute))
 # La cadena comercial Oxxito necesita una aplicación que le permita manejar
 # sus procesos de inventarios, proveedores y venta a público en general.
 # Sus necesidades son las siguientes:
@@ -39,47 +36,7 @@ def registra(tipoRegistro):
         break
   return
 
-# registra(1)
-# print(listaProveedores)
-# registra(2)
-# print(listaVendedores)
-
-# - Control de inventario:
-#   * Alta, modificación y eliminación de productos --> OK
-#   * Agregar inventario (agregar existencias) --> OK
-#   * Ajuste de inventario (modificar existencias) -> TAREA
-# Información de los productos:
-# - Código de barras
-# - Descripción del producto
-# - Existencia
-# - Precio de compra*
-# - Precio de venta*
-# - Proveedor
-# - Ganancia --
-
-# listaMovimientos = [
-#  [
-#    fecha,
-#    hora,
-#    descripciónProducto,
-#    movimiento,
-#    cantAnterior,
-#    tipoMovimiento,
-#    cantidadMovimiento,
-#    cantidadActual
-#   ],
-#   [
-#    fecha,
-#    hora,
-#    descripciónProducto,
-#    movimiento,
-#    cantAnterior,
-#    tipoMovimiento,
-#    cantidadMovimiento,
-#    cantidadActual
-#   ],
-# ]
-
+# Sección de declaración de variables globales
 listaInventario = []
 listaMovimientos = []
 numInventario = 0
@@ -92,6 +49,7 @@ listaInventario =[
   [321, 'Chips Jalapeño', 7, 10.9, 15.00, 'Barcel', 5.10, 46.79]
 ]
 
+# Sección de funciones
 def agregaProducto():
   while True:
     cb = int(input('Código de barras del producto: '))
@@ -107,7 +65,6 @@ def agregaProducto():
     if opc == 'n' or opc == 'N':
       break
   return
-
 
 def buscaProducto(cb):
   i = 0
@@ -130,7 +87,6 @@ def modificaProducto(cb):
       opc = int(input('Elige un número de opción a modificar: '))
       if opc == 3 or opc == 4 or opc == 5:
         listaInventario[i][opc-1] = float(input('Escribe el nuevo valor: '))
-        # round(numero, decimales) --> función de redondeo
         listaInventario[i][6] = round(float(listaInventario[i][4] - listaInventario[i][3]), 2)
         listaInventario[i][7] = round(float(100/listaInventario[i][3]*listaInventario[i][6]), 2)
       else:
@@ -180,7 +136,6 @@ def getDate():
     year = str(date.year)
   return day+'/'+month+'/'+year
 
-
 def getHour():
   hour = ''
   minute = ''
@@ -201,12 +156,6 @@ def getHour():
   return hour+':'+minute+':'+second
 
 def registraMovimiento(fecha, hora, tipoMovimiento, i, cantidad, razon=False, numV=0):
-  # Función registroMovimiento(tipoMovimiento)
-    # - Parámetro para tipo de movimiento
-    # - Parámetro para cantidadMovimiento
-    # - Parámetro para descripcion del producto
-    # - Parámetro para la cantidad a agregar/quitar
-    # tipoMovimiento = 'Entrada'/'Salida'/'Devolución'/'Ajuste'
     habia = 0
     hay = 0
     if tipoMovimiento == 'Entrada':
@@ -249,9 +198,7 @@ def agregaInventario(cb):
     print('Descripción:', listaInventario[i][1])
     print('Existencia:', str(listaInventario[i][2]))
     cantidad = float(input('Escribe la cantidad a agregar: '))
-    # Inicia registro del movimiento...
     registraMovimiento(getDate(), getHour(), 'Entrada', i, cantidad)
-    # Fin de registro de movimientos
     listaInventario[i][2] += cantidad
   else:
     print('¡Error... producto NO encontrado!')
@@ -346,12 +293,12 @@ def registraVentas():
 # Reportes de ventas:
 # - Por día --> fecha(día/mes/año)
 # - Por mes
-#   * Mes natural --> desde fecha inicial (día actual/mes anterior/año) hasta fecha final (actual) 
+#   * Mes natural --> desde fecha inicial (día actual/mes anterior/año) hasta fecha final (actual)
 #   * Mes calendario --> desde 1er día del mes actual hasta último día del mes actual
-# - Por año
+# - Por año --> TAREA
 #   * Año natural --> desde día/mes/año anterior hasta día/mes/año actual
 #   * Año calendario --> desde el primer día del año hasta la fecha actual
-# - Por periodo personalizado (fechas)
+# - Por periodo personalizado (fechas) --> TAREA
 #   * Desde una fecha inicial hasta una fecha final elegida por el usuario
 def menu():
   print('''
@@ -376,18 +323,30 @@ def menu():
     ventaMes(opc)
    
 def ventaMes(opc):
+  print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
+  fechaActual = getDate().split('/')
   if opc == '1':
-    print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
-    fechaActual = getDate().split('/')
     fechaMesAnterior = [fechaActual[0], str(f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 else int(fechaActual[1])-1), fechaActual[2]]
     if fechaMesAnterior[1] == '00':
       fechaMesAnterior[1] = '12'
       fechaMesAnterior[2] = str(int(fechaActual[2])-1)
-    print('fechaActual -->',fechaActual)
-    print('fechaAnterior -->',fechaMesAnterior)
-
-    # for venta in listaRegistroVenta:
-    #   print(venta[0])
+    for ventas in listaRegistroVenta:
+      fechapro=ventas[0].split("/")
+      print(fechapro)
+      diaproducto=int(fechapro[0])
+      diamespasado=int(fechaMesAnterior[0])
+      diaactual=int(fechaActual[0])
+      if fechapro[2]==fechaMesAnterior[2] or fechaMesAnterior[1]=="12":
+        if (fechapro[1] == fechaActual[1] and diaproducto <= diaactual) or (fechapro[1] == fechaMesAnterior[1] and diaproducto >= diaactual)
+          print(ventas)
+  elif opc=="2":
+    fechahoy = getDate().split('/')
+    diahoy=int(fechahoy[0])
+    for ventas in listaRegistroVenta:
+      fechapro=ventas[0].split("/")
+      diaproducto=int(fechapro[0])
+      if (fechahoy[2]==fechapro[2] and fechahoy[1]==fechapro[1]) and (diaproducto<=diahoy):
+          print(ventas)
    
 # registraVentas()
 ventaMes('1')
@@ -434,8 +393,6 @@ def cancelaProducto(numVenta, cb):
             break
         if found == True: break
       if found == True: break
-
-
 
 # registraVentas()
 # print(listaMovimientos)
