@@ -1,4 +1,5 @@
 import datetime
+import calendar
 # La cadena comercial Oxxito necesita una aplicación que le permita manejar
 # sus procesos de inventarios, proveedores y venta a público en general.
 # Sus necesidades son las siguientes:
@@ -8,8 +9,23 @@ import datetime
 # - Llevar un registro de sus proveedores (nombre, número de contacto, empresa)
 # --> OK
 # - Registro de usuarios del sistema (vendedores) --> OK
+# Sección de declaración de variables globales
+listaInventario = []
+listaMovimientos = []
+numInventario = 0
+numAjuste = 0
+listaRegistroVenta = []
+numVenta = len(listaRegistroVenta)
 listaProveedores = []
 listaVendedores = []
+
+listaInventario =[ 
+  [123, 'Gansito Marinela', 4, 7.50, 12.00, 'Marinela', 4.50, 60.0],
+  [321, 'Chips Jalapeño', 7, 10.9, 15.00, 'Barcel', 5.10, 46.79]
+]
+
+
+# Sección de funciones
 
 # tipoRegistro = 1 --> Proveedor
 # tipoRegistro = 2 --> Vendedor
@@ -36,20 +52,6 @@ def registra(tipoRegistro):
         break
   return
 
-# Sección de declaración de variables globales
-listaInventario = []
-listaMovimientos = []
-numInventario = 0
-numAjuste = 0
-listaRegistroVenta = []
-numVenta = len(listaRegistroVenta)
-
-listaInventario =[ 
-  [123, 'Gansito Marinela', 4, 7.50, 12.00, 'Marinela', 4.50, 60.0],
-  [321, 'Chips Jalapeño', 7, 10.9, 15.00, 'Barcel', 5.10, 46.79]
-]
-
-# Sección de funciones
 def agregaProducto():
   while True:
     cb = int(input('Código de barras del producto: '))
@@ -117,78 +119,81 @@ def eliminaProducto(cb):
   return
 
 def getDate():
-  date = datetime.datetime.now()
-  month = ''
-  day = ''
-  year = ''
-  date = datetime.datetime.now()
-  if date.day < 10:
-    day = '0'+str(date.day)
-  else:
-    day = str(date.day)
-  if date.month < 10:
-    month = '0'+str(date.month)
-  else:
-    month = str(date.month)
-  if date.year < 10:
-    year = '0'+str(date.year)
-  else:
-    year = str(date.year)
-  return day+'/'+month+'/'+year
+  # date = 
+  return datetime.date.today() # datetime.datetime.strptime(date, '%d/%m/%Y')
+  # month = ''
+  # day = ''
+  # year = ''
+  # if date.day < 10:
+  #   day = f'0{date.day}'
+  # else:
+  #   day = f'{date.day}'
+  # if date.month < 10:
+  #   month = f'0{date.month}'
+  # else:
+  #   month = f'{date.month}'
+  # if date.year < 10:
+  #   year = f'0{date.year}'
+  # else:
+  #   year = f'{date.year}'
+  # return f'{day}/{month}/{year}'
+
 
 def getHour():
-  hour = ''
-  minute = ''
-  second = ''
-  date = datetime.datetime.now()
-  if date.hour < 10:
-    hour = '0'+str(date.hour)
-  else:
-    hour = str(date.hour)
-  if date.minute < 10:
-    minute = '0'+str(date.minute)
-  else:
-    minute = str(date.minute)
-  if date.second < 10:
-    second = '0'+str(date.second)
-  else:
-    second = str(date.second)
-  return hour+':'+minute+':'+second
+  date = datetime.datetime.today()
+  # hour = 
+  return datetime.time(date.hour, date.minute, date.second) # datetime.datetime.strptime(date, '%H:%M:%S')
+  # hour = ''
+  # minute = ''
+  # second = ''
+  # if date.hour < 10:
+  #   hour = f'0{date.hour}'
+  # else:
+  #   hour = f'{date.hour}'
+  # if date.minute < 10:
+  #   minute = f'0{date.minute}'
+  # else:
+  #   minute = f'{date.minute}'
+  # if date.second < 10:
+  #   second = f'0{date.second}'
+  # else:
+  #   second = f'{date.second}'
+  # return f'{hour}:{minute}:{second}'
 
 def registraMovimiento(fecha, hora, tipoMovimiento, i, cantidad, razon=False, numV=0):
-    habia = 0
-    hay = 0
-    if tipoMovimiento == 'Entrada':
-      global numInventario
-      numInventario +=1
-      hay = listaInventario[i][2] + cantidad
-      habia = listaInventario[i][2]
-      movimiento = f'Recepción de inventario #{numInventario}'
-    elif tipoMovimiento == 'Salida':
-      habia = listaInventario[i][2] + cantidad
-      hay = listaInventario[i][2]
-      movimiento = f'Venta #{numV}'
-    elif tipoMovimiento == 'Devolución':
-      hay = listaInventario[i][2] + cantidad
-      habia = listaInventario[i][2]      
-      movimiento = f'Devolución de venta #{numV}'
-    elif tipoMovimiento == 'Ajuste':
-      global numAjuste
-      numAjuste += 1
-      habia = listaInventario[i][2]
-      hay = listaInventario[i][2] + cantidad
-      movimiento = f'Ajuste #{numAjuste}: {razon}'
-    listaMovimientos.append([
-      fecha,
-      hora,
-      listaInventario[i][1],
-      movimiento,
-      habia,
-      tipoMovimiento,
-      cantidad,
-      hay
-    ])
-    return
+  habia = 0
+  hay = 0
+  if tipoMovimiento == 'Entrada':
+    global numInventario
+    numInventario +=1
+    hay = listaInventario[i][2] + cantidad
+    habia = listaInventario[i][2]
+    movimiento = f'Recepción de inventario #{numInventario}'
+  elif tipoMovimiento == 'Salida':
+    habia = listaInventario[i][2] + cantidad
+    hay = listaInventario[i][2]
+    movimiento = f'Venta #{numV}'
+  elif tipoMovimiento == 'Devolución':
+    hay = listaInventario[i][2] + cantidad
+    habia = listaInventario[i][2]      
+    movimiento = f'Devolución de venta #{numV}'
+  elif tipoMovimiento == 'Ajuste':
+    global numAjuste
+    numAjuste += 1
+    habia = listaInventario[i][2]
+    hay = listaInventario[i][2] + cantidad
+    movimiento = f'Ajuste #{numAjuste}: {razon}'
+  listaMovimientos.append([
+    fecha,
+    hora,
+    listaInventario[i][1],
+    movimiento,
+    habia,
+    tipoMovimiento,
+    cantidad,
+    hay
+  ])
+  return
 
 def agregaInventario(cb):
   i = buscaProducto(cb)
@@ -216,6 +221,7 @@ def ajustaInventario(cb):
     listaInventario[i][2] += cantidad
   else:
     print('¡Error... producto NO encontrado!')
+  return
 
 def reporteInventario():
   print('C. de barras\tDescripción\t\tExist.\tP.Compra\tP.Vta\tProveedor\t%Ganancia')
@@ -228,12 +234,14 @@ def reporteInventario():
     pc = producto[3]
     desc = producto[1]
     print(f'{cb}\t{desc}\t{exist}\t${pc}\t\t${pv}\t{prov}\t{pct}%')
+  return
 
 def reporteProveedores():
   print('Nombre del proveedor\t\tNúmero de contacto\tEmpresa')
   for proveedor in listaProveedores:
     detalleProv = '{}\t\t\t{}\t\t{}'
     print(detalleProv.format(proveedor[0], proveedor[1], proveedor[2]))
+  return
 
 def registraVentas():
   global numVenta
@@ -289,6 +297,8 @@ def registraVentas():
         i = buscaProducto(producto[0])
         registraMovimiento(registro[0], registro[1], 'Salida', i, producto[3], False, registro[2])
       break
+  return
+
 
 # Reportes de ventas:
 # - Por día --> fecha(día/mes/año)
@@ -300,7 +310,26 @@ def registraVentas():
 #   * Año calendario --> desde el primer día del año hasta la fecha actual
 # - Por periodo personalizado (fechas) --> TAREA
 #   * Desde una fecha inicial hasta una fecha final elegida por el usuario
-def menu():
+#   desde enero hasta marzo => 01/01/año actual hasta 30/03/año actual
+#   desde 15 enero hasta el 23 marzo => 15/01/año actual hasta 23/marzo/año actual
+#   desde 5 junio 2018 hasta 4 abril 2020 => 05/06/2018 hasta 04/04/2020
+#   validar fechas
+#
+#   desde una fecha inicial hasta la fecha actual
+#   desde año inicial hasta año final
+#   desde una fecha inicial hasta una fecha final
+#   desde mes/año inicial hasta mes/año final
+#
+#   periodo: 29/02/2019 hasta 04/04/2020
+
+# date = datetime.datetime.now()
+# print(date.year)
+# bisiesto =  True if 2010%4 == 0 else False
+# print(bisiesto)
+
+# print(calendar.monthrange(2019,2)[1])
+
+def reporteVentas():
   print('''
   --- Reporte de ventas ---
   1. Ventas por día
@@ -320,36 +349,129 @@ def menu():
       2. Mes calendario
       ''')
     opc = input('Elige el tipo de mes: ')    
-    ventaMes(opc)
-   
-def ventaMes(opc):
+    ventasMes(opc)
+  elif opc == '3':
+    print('''
+      1. Año natural
+      2. Año calendario
+      ''')
+    opc = input('Elige el tipo de año: ')    
+    ventasAnio(opc)
+  elif opc == '4':
+    i = 0
+    while i < 2:
+      msg = 'inicial' if i == 0 else 'final'
+      while True:
+        anio = int(input(f'Escribe el año {msg}:'))
+        if 2000 < anio <= getDate().year:
+          break
+        else:
+          print(f'Año fuera de rango, escribe un año entre 2001 y {getDate().year}')
+      while True:
+        mes = int(input(f'Escribe el mes {msg}:'))
+        if 1 <= mes <= 12:
+          break
+        else:
+          print('Mes fuera de rango, escribe un número entre 1 y 12')
+      while True:
+        dia = int(input(f'Escribe el día {msg}:'))
+        if 1 <= dia <= calendar.monthrange(anio, mes)[1]:
+          break
+        else:
+          print(f'Día fuera de rango, escribe un número entre 1 y {calendar.monthrange(anio, mes)[1]}')
+      if i == 0:
+        fechaInicial = datetime.date(anio, mes, dia)
+      else:
+        fechaFinal = datetime.date(anio, mes, dia)
+      i += 1
+    if fechaInicial <= fechaFinal:
+      ventasPersonalizadas(fechaInicial, fechaFinal)
+    else:
+      ventasPersonalizadas(fechaFinal, fechaInicial)
+  return
+
+
+def ventasMes(opc):
   print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
   fechaActual = getDate().split('/')
   if opc == '1':
-    fechaMesAnterior = [fechaActual[0], str(f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 else int(fechaActual[1])-1), fechaActual[2]]
-    if fechaMesAnterior[1] == '00':
-      fechaMesAnterior[1] = '12'
-      fechaMesAnterior[2] = str(int(fechaActual[2])-1)
+    fechaMesAnterior = [
+      fechaActual[0], 
+      '12' if int(fechaActual[1])-1 == 0 else 
+      f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 and int(fechaActual[1])-1>0 else 
+      f'{int(fechaActual[1])-1}', 
+      f'{int(fechaActual[2])-1}' if int(fechaActual[1]) == 1 else f'{fechaActual[2]}'
+      ]
     for ventas in listaRegistroVenta:
-      fechapro=ventas[0].split("/")
-      print(fechapro)
-      diaproducto=int(fechapro[0])
-      diamespasado=int(fechaMesAnterior[0])
-      diaactual=int(fechaActual[0])
-      if fechapro[2]==fechaMesAnterior[2] or fechaMesAnterior[1]=="12":
-        if (fechapro[1] == fechaActual[1] and diaproducto <= diaactual) or (fechapro[1] == fechaMesAnterior[1] and diaproducto >= diaactual)
+      fechaVenta=ventas[0].split("/")
+      print(fechaVenta)
+      diaVenta=int(fechaVenta[0])
+      diaActual=int(fechaActual[0])
+      if fechaVenta[2]==fechaMesAnterior[2] or fechaMesAnterior[1]=="12":
+        if (fechaVenta[1] == fechaActual[1] and diaVenta <= diaActual) or (fechaVenta[1] == fechaMesAnterior[1] and diaVenta >= diaActual):
           print(ventas)
   elif opc=="2":
-    fechahoy = getDate().split('/')
-    diahoy=int(fechahoy[0])
+    diaActual=int(fechaActual[0])
     for ventas in listaRegistroVenta:
-      fechapro=ventas[0].split("/")
-      diaproducto=int(fechapro[0])
-      if (fechahoy[2]==fechapro[2] and fechahoy[1]==fechapro[1]) and (diaproducto<=diahoy):
+      fechaVenta=ventas[0].split("/")
+      diaVenta=int(fechaVenta[0])
+      if (fechaActual[2]==fechaVenta[2] and fechaActual[1]==fechaVenta[1]) and (diaVenta<=diaActual):
           print(ventas)
-   
+  return
+
+def bisiesto(anio):
+  if (anio%4 == 0 and anio%100 != 0) or anio%400 == 0:
+    return True
+  else:
+    return False
+
+# def date2str(d):
+#   return d.strftime('%d/%m/%Y')
+
+# def date2list(d):
+#   return d.strftime('%d/%m/%Y').split('/')
+
+# def hour2str(h):
+#   return h.strftime('%H:%M:%S')
+
+def ventasAnio(opc):
+  fechaActual = getDate()
+  if opc == '1':
+    d = 366 if bisiesto(fechaActual.year) and fechaActual.month > 2 else 365
+    fechaAnioAnterior = fechaActual - datetime.timedelta(days=d)
+    for venta in listaRegistroVenta:
+      if fechaAnioAnterior <= venta[0] <= fechaActual:
+        print(venta)
+  elif opc == '2':
+    fechaInicial = datetime.date(fechaActual.year, 1, 1)
+    for venta in listaRegistroVenta:
+      if fechaInicial <= venta[0] <= fechaActual:
+        print(venta)
+  return
+
+def ventasPersonalizadas(inicio, fin):
+  for venta in listaRegistroVenta:
+    if inicio <= venta[0] <= fin:
+      print(venta)
+
+
 # registraVentas()
-ventaMes('1')
+# ventasAnio('2')
+# ventaMes('1')
+reporteVentas()
+
+# fechaActual = getDate().split('/')
+# fechaMesAnterior = [
+#   fechaActual[0], 
+#   '12' if int(fechaActual[1])-1 == 0 else 
+#   f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 and int(fechaActual[1])-1>0 else f'{int(fechaActual[1])-1}', 
+#   f'{int(fechaActual[2])-1}' if int(fechaActual[1]) == 1 else f'{fechaActual[2]}']
+# print(f'Fecha actual: {fechaActual}, Mes anterior: {fechaMesAnterior}')
+# fecha = getDate().split('/')
+# anio = int(fecha[2])
+# bisiesto = True if (anio%4 == 0 and anio%100 != 0) or anio%400 == 0 else False
+# print(getDate(), getHour(), anio, bisiesto)
+
 
 def ventasDia(dia, mes, anio):
   print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
