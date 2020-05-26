@@ -1,5 +1,7 @@
 import datetime
 import calendar
+import sys
+import dateutil.relativedelta
 # La cadena comercial Oxxito necesita una aplicación que le permita manejar
 # sus procesos de inventarios, proveedores y venta a público en general.
 # Sus necesidades son las siguientes:
@@ -23,7 +25,6 @@ listaInventario =[
   [123, 'Gansito Marinela', 4, 7.50, 12.00, 'Marinela', 4.50, 60.0],
   [321, 'Chips Jalapeño', 7, 10.9, 15.00, 'Barcel', 5.10, 46.79]
 ]
-
 
 # Sección de funciones
 
@@ -54,11 +55,40 @@ def registra(tipoRegistro):
 
 def agregaProducto():
   while True:
-    cb = int(input('Código de barras del producto: '))
+    while True:
+      try:
+        cb = int(input('Código de barras del producto: '))
+        break
+      except ValueError:
+        print("Inserta solo numeros")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
     descripcion = input('Descripción del producto: ')
-    existencia = float(input('Cantidad a agregar: '))
-    pCompra = float(input('Precio de compra: '))
-    pVenta = float(input('Precio de venta: '))
+    while True:
+      try:
+        existencia = float(input('Cantidad a agregar: '))
+        break
+      except ValueError:
+        print("Inserta solo numeros")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
+
+    while True:
+      try:
+        pCompra = float(input('Precio de compra: '))
+        break
+      except ValueError:
+        print("Ingresa solo numeros")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
+    while True:
+      try:
+        pVenta = float(input('Precio de venta: '))
+        break
+      except ValueError:
+        print("Ingresa solo numeros")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
     proveedor = input('Proveedor: ')
     ganancia = round(pVenta - pCompra, 2)
     pctGanancia = round(100/pCompra*ganancia, 2)
@@ -86,7 +116,17 @@ def modificaProducto(cb):
       print('4. Precio de compra:', listaInventario[i][3])
       print('5. Precio de venta:', listaInventario[i][4])
       print('6. Proveedor:', listaInventario[i][5])
-      opc = int(input('Elige un número de opción a modificar: '))
+      while True:
+        try:
+          opc = int(input('Elige un número de opción a modificar: '))
+          if 1<=opc<=6:
+            break
+          else:
+            print("Escribe un numero entre 1 y 6")
+        except ValueError:
+          print("Pon solo numeros")
+        except KeyboardInterrupt:
+          print("No puedes cancelar")        
       if opc == 3 or opc == 4 or opc == 5:
         listaInventario[i][opc-1] = float(input('Escribe el nuevo valor: '))
         listaInventario[i][6] = round(float(listaInventario[i][4] - listaInventario[i][3]), 2)
@@ -119,46 +159,12 @@ def eliminaProducto(cb):
   return
 
 def getDate():
-  # date = 
   return datetime.date.today() # datetime.datetime.strptime(date, '%d/%m/%Y')
-  # month = ''
-  # day = ''
-  # year = ''
-  # if date.day < 10:
-  #   day = f'0{date.day}'
-  # else:
-  #   day = f'{date.day}'
-  # if date.month < 10:
-  #   month = f'0{date.month}'
-  # else:
-  #   month = f'{date.month}'
-  # if date.year < 10:
-  #   year = f'0{date.year}'
-  # else:
-  #   year = f'{date.year}'
-  # return f'{day}/{month}/{year}'
-
 
 def getHour():
   date = datetime.datetime.today()
-  # hour = 
   return datetime.time(date.hour, date.minute, date.second) # datetime.datetime.strptime(date, '%H:%M:%S')
-  # hour = ''
-  # minute = ''
-  # second = ''
-  # if date.hour < 10:
-  #   hour = f'0{date.hour}'
-  # else:
-  #   hour = f'{date.hour}'
-  # if date.minute < 10:
-  #   minute = f'0{date.minute}'
-  # else:
-  #   minute = f'{date.minute}'
-  # if date.second < 10:
-  #   second = f'0{date.second}'
-  # else:
-  #   second = f'{date.second}'
-  # return f'{hour}:{minute}:{second}'
+
 
 def registraMovimiento(fecha, hora, tipoMovimiento, i, cantidad, razon=False, numV=0):
   habia = 0
@@ -202,7 +208,14 @@ def agregaInventario(cb):
     print('Código de barras:', listaInventario[i][0])
     print('Descripción:', listaInventario[i][1])
     print('Existencia:', str(listaInventario[i][2]))
-    cantidad = float(input('Escribe la cantidad a agregar: '))
+    while True:
+      try:
+        cantidad = float(input('Escribe la cantidad a agregar: '))
+        break
+      except ValueError:
+        print("Ingresa solo numeros")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
     registraMovimiento(getDate(), getHour(), 'Entrada', i, cantidad)
     listaInventario[i][2] += cantidad
   else:
@@ -215,7 +228,14 @@ def ajustaInventario(cb):
     print('Código de barras:', listaInventario[i][0])
     print('Descripción:', listaInventario[i][1])
     print('Existencia:', listaInventario[i][2])
-    cantidad = int(input('Cantidad a ajustar (la cantidad puede ser positiva o negativa): '))
+    while True:
+      try:
+        cantidad = int(input('Cantidad a ajustar (la cantidad puede ser positiva o negativa): '))
+        break
+      except ValueError:
+        print("Ingresa solo numeros")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
     razon = input('Motivo del ajuste: ')
     registraMovimiento(getDate(), getHour(), 'Ajuste', i, cantidad, razon)
     listaInventario[i][2] += cantidad
@@ -250,13 +270,27 @@ def registraVentas():
   while True:
     while True:
       update = False
-      cb = int(input('Código de barras del producto: '))
+      while True:
+        try:
+          cb = int(input('Código de barras del producto: '))
+          break
+        except ValueError:
+          print("Introduce solo numeros")
+        except KeyboardInterrupt:
+          print("No puedes cancelar")
       producto = buscaProducto(cb)
       print('Código de barras:',str(listaInventario[producto][0]))
       print("Descripción:",str(listaInventario[producto][1]))
       print('Precio: $',str(listaInventario[producto][4]))
       while True:
-        cantidad = float(input('Cantidad a vender:'))
+        while True:
+          try:
+            cantidad = float(input('Cantidad a vender:'))
+            break
+          except ValueError:
+            print("Ingresa solo numeros")
+          except KeyboardInterrupt:
+            print("No puedes cancelar")
         if(listaInventario[producto][2] < cantidad and cantidad >0):
           print('No hay existencia suficiente, intenta con otra cantidad, o escribe -1 para continuar....')
         elif cantidad == -1:
@@ -279,12 +313,29 @@ def registraVentas():
       opc = input('Deseas seguir vendiendo? (s/n):')
       if opc == 'n' or opc == 'N':
         break
-    opc = int(input('1--> Finalizar compra, 2-->Vender otro producto: '))
+    while True:
+      try:
+        opc = int(input('1--> Finalizar compra, 2-->Vender otro producto: '))
+        if 1<=opc<=2:
+          break
+        else:
+          print("Ingresa 1 o 2")
+      except ValueError:
+        print("Ingresa Solo numero")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
     if opc == 1:
       break
   while True:
     print('El total es $'+str(importe))
-    pagar = float(input('Con cuánto paga?'))
+    while True:
+      try:
+        pagar = float(input('Con cuánto paga?'))
+        break
+      except ValueError:
+        print("Ingresa solo numeros")
+      except KeyboardInterrupt:
+        print("No puedes cancelar")
     if pagar < importe:
       print('Te falta dinero para completar el importe, no te hagas wey!')
     else:
@@ -298,7 +349,6 @@ def registraVentas():
         registraMovimiento(registro[0], registro[1], 'Salida', i, producto[3], False, registro[2])
       break
   return
-
 
 # Reportes de ventas:
 # - Por día --> fecha(día/mes/año)
@@ -322,13 +372,6 @@ def registraVentas():
 #
 #   periodo: 29/02/2019 hasta 04/04/2020
 
-# date = datetime.datetime.now()
-# print(date.year)
-# bisiesto =  True if 2010%4 == 0 else False
-# print(bisiesto)
-
-# print(calendar.monthrange(2019,2)[1])
-
 def reporteVentas():
   print('''
   --- Reporte de ventas ---
@@ -351,12 +394,25 @@ def reporteVentas():
     opc = input('Elige el tipo de mes: ')    
     ventasMes(opc)
   elif opc == '3':
-    print('''
-      1. Año natural
-      2. Año calendario
-      ''')
-    opc = input('Elige el tipo de año: ')    
-    ventasAnio(opc)
+    while True:
+      try:
+        print('''
+          1. Año natural
+          2. Año calendario
+          ''')
+        opc = int(input('Elige el tipo de año: '))
+        if 1 <= opc <= 2:
+          ventasAnio(opc)
+          break
+        else:
+          print('Escribe 1 o 2')
+      except ValueError:
+        print('¡ERROR! Escribe sólo números enteros')
+      except KeyboardInterrupt:
+        print('\n¡ERROR! El proceso no puede ser cancelado')
+
+# sys.exit() <--- Finalizar un programa y salir al sistema
+
   elif opc == '4':
     i = 0
     while i < 2:
@@ -390,32 +446,32 @@ def reporteVentas():
       ventasPersonalizadas(fechaFinal, fechaInicial)
   return
 
-
 def ventasMes(opc):
   print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
-  fechaActual = getDate().split('/')
+  fechaActual = getDate()
   if opc == '1':
-    fechaMesAnterior = [
-      fechaActual[0], 
-      '12' if int(fechaActual[1])-1 == 0 else 
-      f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 and int(fechaActual[1])-1>0 else 
-      f'{int(fechaActual[1])-1}', 
-      f'{int(fechaActual[2])-1}' if int(fechaActual[1]) == 1 else f'{fechaActual[2]}'
-      ]
+    fechaMesAnterior = fechaActual - dateutil.relativedelta.relativedelta(months=1)
+    # [
+    #   fechaActual[0], 
+    #   '12' if int(fechaActual[1])-1 == 0 else 
+    #   f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 and int(fechaActual[1])-1>0 else 
+    #   f'{int(fechaActual[1])-1}', 
+    #   f'{int(fechaActual[2])-1}' if int(fechaActual[1]) == 1 else f'{fechaActual[2]}'
+    #   ]
     for ventas in listaRegistroVenta:
-      fechaVenta=ventas[0].split("/")
+      fechaVenta=ventas[0]
       print(fechaVenta)
-      diaVenta=int(fechaVenta[0])
-      diaActual=int(fechaActual[0])
-      if fechaVenta[2]==fechaMesAnterior[2] or fechaMesAnterior[1]=="12":
-        if (fechaVenta[1] == fechaActual[1] and diaVenta <= diaActual) or (fechaVenta[1] == fechaMesAnterior[1] and diaVenta >= diaActual):
+      diaVenta = fechaVenta.day #int(fechaVenta[0])
+      diaActual = fechaActual.day # int(fechaActual[0])
+      if fechaVenta.year == fechaMesAnterior.year or fechaMesAnterior.month == 12: # fechaVenta[2]==fechaMesAnterior[2] or fechaMesAnterior[1]=="12":
+        if (fechaVenta.month == fechaActual.month and diaVenta == diaActual) or (fechaVenta.month == fechaMesAnterior.month and diaVenta >= diaActual):# (fechaVenta[1] == fechaActual[1] and diaVenta <= diaActual) or (fechaVenta[1] == fechaMesAnterior[1] and diaVenta >= diaActual):
           print(ventas)
   elif opc=="2":
-    diaActual=int(fechaActual[0])
+    diaActual = fechaActual.day # int(fechaActual[0])
     for ventas in listaRegistroVenta:
-      fechaVenta=ventas[0].split("/")
-      diaVenta=int(fechaVenta[0])
-      if (fechaActual[2]==fechaVenta[2] and fechaActual[1]==fechaVenta[1]) and (diaVenta<=diaActual):
+      fechaVenta=ventas[0] #.split("/")
+      diaVenta = fechaVenta.day # int(fechaVenta[0])
+      if (fechaActual.year == fechaVenta.year and fechaActual.month == fechaVenta.month) and diaVenta <= diaActual: #(fechaActual[2]==fechaVenta[2] and fechaActual[1]==fechaVenta[1]) and (diaVenta<=diaActual):
           print(ventas)
   return
 
@@ -436,42 +492,34 @@ def bisiesto(anio):
 
 def ventasAnio(opc):
   fechaActual = getDate()
-  if opc == '1':
+  ventas = False
+  if opc == 1:
     d = 366 if bisiesto(fechaActual.year) and fechaActual.month > 2 else 365
     fechaAnioAnterior = fechaActual - datetime.timedelta(days=d)
     for venta in listaRegistroVenta:
       if fechaAnioAnterior <= venta[0] <= fechaActual:
+        ventas = True
         print(venta)
-  elif opc == '2':
+  elif opc == 2:
     fechaInicial = datetime.date(fechaActual.year, 1, 1)
     for venta in listaRegistroVenta:
       if fechaInicial <= venta[0] <= fechaActual:
+        ventas = True
         print(venta)
+  if not ventas:
+    print('No hay ventas para mostrar...')
   return
 
 def ventasPersonalizadas(inicio, fin):
   for venta in listaRegistroVenta:
     if inicio <= venta[0] <= fin:
       print(venta)
-
+  return
 
 # registraVentas()
 # ventasAnio('2')
 # ventaMes('1')
-reporteVentas()
-
-# fechaActual = getDate().split('/')
-# fechaMesAnterior = [
-#   fechaActual[0], 
-#   '12' if int(fechaActual[1])-1 == 0 else 
-#   f'0{int(fechaActual[1])-1}' if int(fechaActual[1])-1<10 and int(fechaActual[1])-1>0 else f'{int(fechaActual[1])-1}', 
-#   f'{int(fechaActual[2])-1}' if int(fechaActual[1]) == 1 else f'{fechaActual[2]}']
-# print(f'Fecha actual: {fechaActual}, Mes anterior: {fechaMesAnterior}')
-# fecha = getDate().split('/')
-# anio = int(fecha[2])
-# bisiesto = True if (anio%4 == 0 and anio%100 != 0) or anio%400 == 0 else False
-# print(getDate(), getHour(), anio, bisiesto)
-
+# reporteVentas()
 
 def ventasDia(dia, mes, anio):
   print('#Vta\tFecha\t\tHora\tDescripción\tCantidad\tPrecio\tImporte')
@@ -488,6 +536,7 @@ def ventasDia(dia, mes, anio):
         importe = producto[4]
         detalleVenta = '{}\t{}\t{}\t{}\t{}\t{}\t{}' 
         print(detalleVenta.format(nVenta, fecha, hora, descripcion, cantidad, precio, importe))
+  return
 
 def cancelaVenta(numVenta):
   cantidad = 0
@@ -500,6 +549,7 @@ def cancelaVenta(numVenta):
           registraMovimiento(getDate(), getHour(), 'Devolución', buscaProducto(producto[0]), cantidad, False, numVenta)
           listaInventario[buscaProducto(producto[0])][2] += cantidad
       break
+  return
 
 def cancelaProducto(numVenta, cb):
   found = False
@@ -515,17 +565,4 @@ def cancelaProducto(numVenta, cb):
             break
         if found == True: break
       if found == True: break
-
-# registraVentas()
-# print(listaMovimientos)
-# cancelaVenta(1)
-# cancelaProducto(1, 123)
-# print('lista de movimientos: ',listaMovimientos)
-# print('reg. Venta: ',listaRegistroVenta)
-# print('reg. inventario: ',listaInventario)
-
-# ajustaInventario(123)
-# print(listaMovimientos)
-
-# reporteVentas('5','5','2020')
-
+  return
